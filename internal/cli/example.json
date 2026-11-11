@@ -1,0 +1,36 @@
+{
+  "storage": {
+    "endpoint": "https://s3.example.com",
+    "region": "us-east-1",
+    "bucket": "db-backups",
+    "prefix": "cairn",
+    "access_key": "${CAIRN_S3_ACCESS_KEY}",
+    "secret_key": "${CAIRN_S3_SECRET_KEY}"
+  },
+  "compression": {
+    "level": 3
+  },
+  "databases": {
+    "app-postgres": {
+      "engine": "postgres",
+      "host": "127.0.0.1",
+      "port": 5432,
+      "user": "postgres",
+      "password": "${CAIRN_PG_PASSWORD}",
+      "retention": {
+        "keep_full": 4,
+        "keep_logical": 7
+      }
+    },
+    "app-mariadb": {
+      "engine": "mariadb",
+      "socket": "/run/mysqld/mysqld.sock",
+      "user": "root",
+      "password": "${CAIRN_MARIADB_PASSWORD}",
+      "retention": {
+        "keep_full": 4,
+        "keep_logical": 7
+      }
+    }
+  }
+}

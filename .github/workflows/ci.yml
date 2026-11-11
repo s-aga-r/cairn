@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install PostgreSQL 18
+        run: |
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y postgresql-18
+
+      - name: Install MariaDB 11.8
+        run: |
+          curl -fsSL https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version=mariadb-11.8
+          sudo apt-get install -y mariadb-server mariadb-client mariadb-backup
+          sudo systemctl stop mariadb
+
+      - name: Install SeaweedFS
+        run: |
+          curl -fsSL https://github.com/seaweedfs/seaweedfs/releases/download/4.53/linux_amd64.tar.gz | sudo tar -xz -C /usr/local/bin weed
+
+      - name: Check formatting
+        run: test -z "$(gofmt -l .)"
+
+      - name: Test with 100% coverage
+        run: scripts/test.sh
+
+      - name: Test the install script
+        run: scripts/test-install.sh
