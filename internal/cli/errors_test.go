@@ -90,8 +90,12 @@ func TestCheck(t *testing.T) {
 	fails(t, "FAIL  pg connection", testenv.Variant(t, unreachable(pg)), "check", pg)
 	fails(t, "1 checks failed", testenv.Variant(t, unreachable(maria)), "check")
 
+	// Neither bin_dir nor PATH holds the tools.
+	empty := testenv.Variant(t, func(root map[string]any) {
+		testenv.Section(root, "databases", maria)["bin_dir"] = t.TempDir()
+	})
 	t.Setenv("PATH", t.TempDir())
-	fails(t, "FAIL  maria tools: not found: mariadb, mariadb-dump, mariadb-binlog", testenv.Variant(t, nil), "check", maria)
+	fails(t, "FAIL  maria tools: not found: mariadb, mariadb-dump, mariadb-backup, mbstream, mariadb-binlog", empty, "check", maria)
 }
 
 func TestBackupProblems(t *testing.T) {
